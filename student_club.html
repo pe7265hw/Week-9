@@ -66,7 +66,8 @@
     </ul>
 
     <!-- Add a v-on to call removeSelectedStudents -->
-    <button v-on:click="removeSelectedStudents(student)" id="remove-selected-students">Remove selected students</button>
+     <!-- no argument needed here - we're removing all the selected students based on the data in the app  -->
+    <button v-on:click="removeSelectedStudents" id="remove-selected-students">Remove selected students</button>
 
 </div>  <!-- end of div#app -->
 
@@ -104,7 +105,9 @@
 
             const studentList = ref([
                 {name: 'Johnny Student', studentId: 'ab45879lo', studentGpa: '3', selected: false},
-                {name: 'Janie Student', studentId: 'vf730021gt', studentGpa: '2', selected: false}
+                {name: 'Janie Student', studentId: 'vf730021gt', studentGpa: '2', selected: false},
+                {name: 'bob Student', studentId: 'vf730021gt', studentGpa: '2', selected: false},
+                {name: 'fred Student', studentId: 'vf730021gt', studentGpa: '2', selected: false}
             ])
 
 
@@ -148,15 +151,60 @@
                 }
             }
 
-           const removeSelectedStudents = (studentToDelete)=> {
-             let studentsToDelete = []
-             studentList.forEach(student => {
-                if(studentList.selected.value == true){
-                    studentsToDelete.push(studentList.name + '\n')
-                }
-                confirm(`Delete${studentsToDelete}?`)
-             })
-             studentList.value = studentList.value.filter(student => student != studentToDelete)
+           const removeSelectedStudents = () => {  // no argument needed since we can figure 
+            // out who is selected by looking at the vue data in the studentList 
+            
+            let studentsNamesToDelete = studentList.value.filter(student => 
+                    /* write a condition that evaluates to true if we want to keep the student in the list */
+                    student.selected == true   
+                )    // an array of student objects  to delete, with selected = true 
+                .map( student => student.name )   // an array of just names
+                
+                // optional write out step by step
+                // let studentObjectsToDelete = studentList.value.filter(student => 
+                //     /* write a condition that evaluates to true if we want to keep the student in the list */
+                //     student.selected == true   
+                // )    // an array of student objects  to delete, with selected = true 
+                
+                // let studentNames = studentObjectsToDelete.map( student => student.name )   // an array of just names
+
+
+            // // you could write this with a filter statement too 
+            //  let studentsToDelete = []  // make a new array to store students to delete to show a confirmation message 
+            //  studentList.value.forEach(student => {   // check each student 
+            //     // student is an object like 
+            //     // {name: 'Johnny Student', studentId: 'ab45879lo', studentGpa: '3', selected: false},
+            //     if(student.selected == true){   // check if that student's selects is true
+            //         studentsToDelete.push(student.name + '\n')
+            //     }
+               
+            //  })
+             console.log(studentsNamesToDelete)
+             if (confirm(`Delete all these students? ${studentsNamesToDelete}?`)) {
+
+                studentList.value = studentList.value.filter(student => 
+                    /* write a condition that evaluates to true if we want to keep the student in the list */
+                    student.selected == false   // same condition in the loop version 
+                )
+                
+
+                // let studentsToKeep = []
+
+                // // "filtering" with a loop 
+
+                // studentList.value.forEach( oneStudent => {
+
+                //     if (oneStudent.selected == false) { // not selected, want to keep 
+                //         studentsToKeep.push(oneStudent)  // add to array 
+                //     }
+                //     // not selected, ignore 
+
+                // })
+
+                // studentList.value = studentsToKeep
+
+
+             }
            }
 
 
