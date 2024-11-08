@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Club Membership</title>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+  <style>
+      
+      .selected {
+        text-decoration: line-through ;
+        font-style: italic;
+        color: gray;
+      }
+
+      input {
+          width: 100%;
+          padding: 5px;
+          margin: 5px 5px 5px 0px;
+          box-sizing: border-box;
+      }
+
+  </style>
+
+</head>
+<body>
+
+<div id="app">
+    <h1>Student Club Roster</h1>
+
+    <h2>Add Students</h2>
+
+    <label for="student-name">Student Name</label>
+    <input v-model="newStudentName" id="student-name" name="student-name">
+
+    <br>
+
+    <label for="student-id">Student ID</label>
+    <input v-model="newStudentId" id="student-id" name="student-id">
+
+    <br>
+
+    <label for="student-gpa">Student GPA</label>
+    <input v-model="newStudentGpa" id="student-gpa" name="student-gpa" type="number">
+
+    <br>
+
+    <button v-on:click="addNewStudent" id="add-student">Add Student</button>    
+
+    <h2>Student List</h2>
+
+    <p>There is/are 
+        <span id="student-count">
+        {{studentCount}}
+        </span> 
+    student(s) in the club.</p>
+    
+
+    <ul id="student-list">
+        <!-- use v-for to create li elements, one for each student -->
+        <li v-for="student in studentList" v-on:click="selectOrUnselectStudent(student)" v-bind:class="{ selected: student.selected }">
+            <!-- Modify this to display the student's data more neatly - display their name, ID and GPA. -->
+            <!-- for example "Beyonce Knowles, id: aa1234bb, GPA 3.8" -->
+            name: {{student.name}}, id: {{student.studentId}}, GPA: {{student.studentGpa}}
+        </li>
+    </ul>
+
+    <!-- Add a v-on to call removeSelectedStudents -->
+    <button v-on:click="removeSelectedStudents(student)" id="remove-selected-students">Remove selected students</button>
+
+</div>  <!-- end of div#app -->
+
+<script>
+
+    /* This app will store a list of student objects. Each student object should have this structure,
+
+    {name: 'Beyonce Knowles', id: 'aa1234bb', gpa: 3.8, selected: false}
+    
+    Add the following functionality to this page
+
+        * Display the number of students in the student-count span. Keep this value up to date as students are added and removed, using a computed property. 
+    
+        * When the add student button is clicked 
+            - Read the value from the student-name input, save in a variable. If the name is not entered, show an alert error message and return. (1pt)
+            - Read the value from the student-id input, save in a variable. If the id is not entered, show an alert error message and return. (1pt)
+            - Read the value from the student-gpa input, save in a variable. If the GPA is not entered, or is not in the range 0-4, show an alert error message and return.  (1pt)
+        
+        * An event handler that toggles the selected value for a student object is provided for you. 
+        * Each li element will use the appropriate class based on whether a student is selected or not. 
+
+        * When the Remove selected students is clicked, remove all selected students. 
+        
+    */
+
+
+    const { createApp, ref, computed } = Vue 
+
+    createApp({
+        setup() {
+
+            const newStudentName = ref('')
+            const newStudentId = ref('')
+            const newStudentGpa = ref('')
+
+            const studentList = ref([
+                {name: 'Johnny Student', studentId: 'ab45879lo', studentGpa: '3', selected: false},
+                {name: 'Janie Student', studentId: 'vf730021gt', studentGpa: '2', selected: false}
+            ])
+
+
+            const errors = ref([])
+
+             
+            const studentCount = computed(()=>{
+                return studentList.value.length
+            })
+
+            const addNewStudent = () => {
+
+                errors.value=[]
+
+                if(newStudentName.value.length == 0){
+                    errors.value.push('Please enter a Student Name.')
+                }
+                if(newStudentId.value.length == 0){
+                    errors.value.push('Please enter a Student ID.')
+                }
+                if(newStudentGpa.value.length == 0){
+                    errors.value.push('Please enter a Student GPA.')
+                } else if(newStudentGpa.value.length < 0 || newStudentGpa.value.length >4 ){
+                    errors.value.push('Student GPA must be between 0 & 4.')
+                }
+  
+                if (errors.value.length > 0) {
+                    alert(errors.value.join('\n'))
+                } else {
+                    let student = {
+                        name: newStudentName.value,
+                        studentId: newStudentId.value,
+                        studentGpa: newStudentGpa.value,
+                        selected: false
+                    }
+                    studentList.value.push(student)
+
+                    newStudentName.value = ''
+                    newStudentId.value = ''
+                    newStudentGpa.value = '' 
+                }
+            }
+
+           const removeSelectedStudents = (studentToDelete)=> {
+             let studentsToDelete = []
+             studentList.forEach(student => {
+                if(studentList.selected.value == true){
+                    studentsToDelete.push(studentList.name + '\n')
+                }
+                confirm(`Delete${studentsToDelete}?`)
+             })
+             studentList.value = studentList.value.filter(student => student != studentToDelete)
+           }
+
+
+            const selectOrUnselectStudent = (student) => {
+                student.selected = !student.selected
+            }
+
+
+            return {
+                // List all the refs and functions and computed properties 
+                newStudentName,newStudentId,newStudentGpa,studentList,addNewStudent,studentCount,errors,
+                selectOrUnselectStudent, removeSelectedStudents
+            }
+        }
+    }).mount('#app')
+
+
+</script>
+
+</body>
+</html>
