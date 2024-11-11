@@ -10,19 +10,20 @@
 </head>
 
 <body>
+    <!--Section of code controlled by Vue id="app"-->
     <div id="app">
         
-        <div id="new-student-form-errors" class="m-2">
+        <div id="new-student-form-errors" class="m-2"> <!--section which shows errors-->
             <!-- TODO show errors from form validation -->
              <div class="alert alert-danger">
                 <li v-for="error in formErrors">
-                    {{error}}
+                    {{error}} <!--display or error variable-->
                 </li>
              </div>
         </div>
 
 
-        <div id="new-student-form" class="card add-student m-2 p-2">
+        <div id="new-student-form" class="card add-student m-2 p-2"> <!--form div-->
             <h4 class="card-title">Add new student</h4>
 
             <div class="form-group mb-3">
@@ -38,17 +39,17 @@
             </div>
 
             <!-- TODO v-on:click event handler -->
-            <button v-on:click="addStudent" class="btn btn-primary">Add</button>
+            <button v-on:click="addStudent" class="btn btn-primary">Add</button> <!--Add button, linked to addStudent function-->
         </div>
 
-
+        <!--Table create to contain student data-->
         <div id="student-list-table" class="card m-2 p-2">
             <h4 class="card-title">Student List</h4>
-            <h5>{{studentCount}} students in class.</h5>
+            <h5>{{studentCount}} students in class.</h5> <!--Count of students in list-->
             <div id="student-table">
                 <table class="table">
                     <thead>
-                        <tr>
+                        <tr><!--Headers for table-->
                             <th>Name</th>
                             <th>StarID</th>
                             <th>Present?</th>
@@ -56,20 +57,18 @@
                     </thead>
 
                    <tbody>
-                        <!-- TODO create table rows 
-                        Each row will have a checkbox, bound to the app's data 
-                        When the checkbox is checked/unchecked, 
-                        the student will be signed in/out -->
 
                         <tr v-for="student in sortedStudents" v-bind:class="{present: student.present, absent: !student.present}">
-                            <td>{{student.name}}</td>
-                            <td>{{student.starID}}</td>
+                            <td>{{student.name}}</td> <!--Contains name variable-->
+                            <td>{{student.starID}}</td> <!--Contains starID variable-->
                             <td>
+                                <!--check box for present or not, displays text whether present or not-->
                                 <input type="checkbox" v-model="student.present" v-on:change="arrivedOrLeft(student)">
                                 <span v-if="student.present" class="mx-3">Here!</span>
                                 <span v-else class="mx-3">Not Present</span>
                             </td>
                             <td>
+                                <!--Delete Student button, linked to deleteStudent function-->
                                 <button v-on:click="deleteStudent(student)" class="btn btn-danger">
                                     <i class="bi bi-trash-fill"></i> Delete
                                 </button>
@@ -82,14 +81,14 @@
             </div>
         </div>
 
-        <div id="welcome-or-goodbye-message" class="m-2">
+        <div id="welcome-or-goodbye-message" class="m-2"> <!--Shows a welcome or goodbye message if check
+            box clicked or not-->
             
-            <!-- TODO show a message when student arrives or leaves  -->
-             <div v-if="mostRecentStudent.name">
+             <div v-if="mostRecentStudent.name"> <!--Displays name if attending-->
                 <div v-if="mostRecentStudent.present" class="alert alert-success">
                     Welcome! {{mostRecentStudent.name}}
                 </div>
-                <div v-else class="alert alert-info">
+                <div v-else class="alert alert-info"> <!--Displays name if not attending-->
                     Goodbye {{mostRecentStudent.name}}, thanks for attending!
                 </div>
              </div>
@@ -100,32 +99,34 @@
 
     <script>
 
-        const{createApp, ref, computed} = Vue 
+        const{createApp, ref, computed} = Vue //creates objects used by Vue
         createApp({
             setup(){
-                //students have a name, starID, present (boolen)
-
+                
+                //creates variables to be used by Vue
                 const newStudentName = ref('')
                 const newStarID = ref('')
-                const studentList = ref([
+                const studentList = ref([ //adds default data
                     {name: 'Bobby Smith', starID: 'dv87987uy', present: false},
                     {name: 'Mary Joe', starID: 'az42117br', present: false}
                 ])
+                //array to contain any errors
                 const formErrors = ref([])
-
+                //array for last student clicked
                 const mostRecentStudent = ref({})
-
+                //function used to add student when Add button clicked
                 function addStudent(){
 
-                    formErrors.value=[]
+                    formErrors.value=[] //ensures formErrors is empty
 
+                    //checks for non valid data, if invalid pushes to formError array
                     if(newStudentName.value.length == 0){
                         formErrors.value.push('Student name must be entered.')
                     }
                     if (newStarID.value.length == 0){
                         formErrors.value.push('StarID must be entered.')
                     }
-
+                    //if length is empty values are added to student and pushed to studentList
                     if(formErrors.value.length === 0){
                     let student = {
                         name:newStudentName.value,
@@ -133,29 +134,30 @@
                         present:false
                     }
                     studentList.value.push(student)
+                    //values are then reset
                     newStudentName.value = ''
                     newStarID.value = ''
                 }}
-
+                //sets mostRecentStudent to the current object of student
                 function arrivedOrLeft(student){
                     mostRecentStudent.value = student
                 }
-
+                //deletes the currently selected student
                 function deleteStudent(studentToDelete){
                     if(confirm(`Delete ${studentToDelete.name}?`)){
                     studentList.value = studentList.value.filter(student => student != studentToDelete)
                 }}
-
+                //sorts the list bu the name of students
                 const sortedStudents = computed(() =>{
                     return studentList.value.toSorted((student1, student2)=>{
                         return student1.name.localeCompare(student2.name)
                     })
                 })
-
+                //computes the number of students in the list
                 const studentCount = computed(()=>{
                     return studentList.value.length
                 })
-
+                //returns the variables to be used by Vue
                 return{
                     studentList,newStudentName,newStarID,addStudent,formErrors,arrivedOrLeft,
                     mostRecentStudent,deleteStudent,sortedStudents,studentCount
